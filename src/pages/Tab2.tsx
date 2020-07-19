@@ -1,23 +1,55 @@
-import React from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
-import './Tab2.css';
+import React from "react";
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonRow,
+  IonCol,
+  IonButton,
+} from "@ionic/react";
+import ExploreContainer from "../components/ExploreContainer";
+import "./Tab2.css";
 
 const Tab2: React.FC = () => {
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Tab 2</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Tab 2</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <ExploreContainer name="Tab 2 page" />
+        <IonItem>
+          <IonLabel position="floating">Name</IonLabel>
+          {/* the floating will float the label */}
+          <IonInput></IonInput>
+        </IonItem>
+        <IonItem>
+          <IonLabel position="floating">Quantity</IonLabel>
+          <IonInput></IonInput>
+        </IonItem>
+        <IonItem>
+          <IonLabel position="floating">Currency</IonLabel>
+          <IonInput></IonInput>
+        </IonItem>
+        <IonRow>
+          <IonCol size="6">
+            <IonButton
+              expand="block"
+              fill="outline"
+              size="default"
+              color="medium"
+            >
+              {/* size = small,default and large */}
+              Cancel
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton expand="block" color="success">
+              Add
+            </IonButton>
+          </IonCol>
+        </IonRow>
       </IonContent>
     </IonPage>
   );
