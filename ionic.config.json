@@ -1,0 +1,7 @@
+{
+  "name": "virtual-wallet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
