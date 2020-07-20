@@ -17,6 +17,26 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
 import { settingsOutline, addCircleOutline } from "ionicons/icons";
 const Tab1: React.FC = () => {
+  var assetList = [
+    {
+    "Name": "Asset1",
+    "Quantity": "100",
+    "Currency": "CAD"
+    }
+  ];
+  if (document.URL.includes("?")) {
+    const urlParams = document.URL.split("?")[1].split("&");
+    const currentName = urlParams[0].split("=")[1];
+    const currentQuantity = urlParams[1].split("=")[1];
+    const currentCurrency = urlParams[2].split("=")[1].toUpperCase();
+    var newAsset = {
+      "Name": currentName,
+      "Quantity": currentQuantity,
+      "Currency": currentCurrency
+    };
+    assetList.push(newAsset);
+  }
+  
   return (
     <IonPage>
       <IonHeader>
@@ -48,21 +68,38 @@ const Tab1: React.FC = () => {
         </IonItem>
         <IonItem>
           <IonGrid>
-            <IonRow>
+            {
+              assetList.map(function(asset, index){
+                return (
+                  <IonRow key={index}>
+                    <IonCol>
+                      <IonLabel>{asset["Name"]}</IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonLabel>{asset["Quantity"]}</IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonLabel>{asset["Currency"]}</IonLabel>
+                    </IonCol>
+                  </IonRow>
+                );
+              })
+            }
+            {/* <IonRow>
               <IonCol>
                 <IonLabel>Assert1</IonLabel>
               </IonCol>
               <IonCol>
-                <IonLabel>2</IonLabel>
+                <IonLabel>100</IonLabel>
               </IonCol>
               <IonCol>
-                <IonLabel>cad 100</IonLabel>
+                <IonLabel>CAD</IonLabel>
               </IonCol>
-            </IonRow>
+            </IonRow> */}
           </IonGrid>
         </IonItem>
         <IonItem>
-          <IonButton size="small" fill="solid">
+          <IonButton size="small" fill="solid" href="/tab2">
             <IonIcon icon={addCircleOutline}></IonIcon>
           </IonButton>
         </IonItem>

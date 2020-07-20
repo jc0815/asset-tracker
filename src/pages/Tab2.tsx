@@ -39,13 +39,14 @@ const Tab2: React.FC = () => {
               fill="outline"
               size="default"
               color="medium"
+              href="/"
             >
               {/* size = small,default and large */}
               Cancel
             </IonButton>
           </IonCol>
           <IonCol size="6">
-            <IonButton expand="block" color="success">
+            <IonButton expand="block" color="success" href="/tab1?name=hi&quantity=100&currency=cad" >
               Add
             </IonButton>
           </IonCol>
