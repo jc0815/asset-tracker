@@ -25,25 +25,31 @@ import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 const Tab1: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
-  var assetList = [
-    {
-      Name: "Asset1",
-      Quantity: "100",
-      Currency: "CAD",
-    },
-  ];
-  if (document.URL.includes("?")) {
-    const urlParams = document.URL.split("?")[1].split("&");
-    const currentName = urlParams[0].split("=")[1];
-    const currentQuantity = urlParams[1].split("=")[1];
-    const currentCurrency = urlParams[2].split("=")[1].toUpperCase();
-    var newAsset = {
-      Name: currentName,
-      Quantity: currentQuantity,
-      Currency: currentCurrency,
+  const exampleAsset = {
+    Name: "Example1",
+    Quantity: "100",
+    Currency: "CAD",
+  };
+
+  const [assetList, setAssetList] = useState([exampleAsset]);
+
+  const [newAssetName, setNewAssetName] = useState("");
+  const [newAssetQuant, setNewAssetQuant] = useState("");
+  const [newAssetCurrency, setNewAssetCurrency] = useState("");
+
+  const onAssetSubmit = () => {
+    const newAsset = {
+      "Name": newAssetName,
+      "Quantity": newAssetQuant,
+      "Currency": newAssetCurrency.toUpperCase()
     };
-    assetList.push(newAsset);
-  }
+    setAssetList(assetList => [...assetList, newAsset]);
+    setShowAddModal(false);
+  };
+
+  const deleteAsset = (asset : any) => {
+    setAssetList(assetList.filter(item => item["Name"] !== asset["Name"]));
+  };
 
   return (
     <IonPage>
@@ -94,7 +100,7 @@ const Tab1: React.FC = () => {
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
-                  onClick={() => console.log("unread clicked")}
+                  onClick={() => deleteAsset(asset)}
                   color="danger"
                 >
                   Delete
@@ -122,15 +128,15 @@ const Tab1: React.FC = () => {
             <IonItem>
               <IonLabel position="floating">Name</IonLabel>
               {/* the floating will float the label */}
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetName(e.detail.value);}} ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetQuant(e.detail.value);}}></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput>
             </IonItem>
             <IonRow>
               <IonCol size="6">
@@ -150,7 +156,7 @@ const Tab1: React.FC = () => {
                 <IonButton
                   expand="block"
                   color="success"
-                  href="/tab1?name=hi&quantity=100&currency=cad"
+                  onClick={() => onAssetSubmit()}
                 >
                   Add
                 </IonButton>
