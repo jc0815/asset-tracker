@@ -16,30 +16,33 @@ import {
   IonInput,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
-import "./Tab1.css";
+import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
-const Tab1: React.FC = () => {
+const Main: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
-  var assetList = [
-    {
-      Name: "Asset1",
-      Quantity: "100",
-      Currency: "CAD",
-    },
-  ];
-  if (document.URL.includes("?")) {
-    const urlParams = document.URL.split("?")[1].split("&");
-    const currentName = urlParams[0].split("=")[1];
-    const currentQuantity = urlParams[1].split("=")[1];
-    const currentCurrency = urlParams[2].split("=")[1].toUpperCase();
-    var newAsset = {
-      Name: currentName,
-      Quantity: currentQuantity,
-      Currency: currentCurrency,
+  const exampleAsset = {
+    Name: "Example1",
+    Quantity: "100",
+    Currency: "CAD",
+  };
+
+  const [assetList, setAssetList] = useState([exampleAsset]);
+
+  const [newAssetName, setNewAssetName] = useState("");
+  const [newAssetQuant, setNewAssetQuant] = useState("");
+  const [newAssetCurrency, setNewAssetCurrency] = useState("");
+
+  const onAssetSubmit = () => {
+    const newAsset = {
+      "Name": newAssetName,
+      "Quantity": newAssetQuant,
+      "Currency": newAssetCurrency.toUpperCase()
     };
-    assetList.push(newAsset);
-  }
+    setAssetList(assetList => [...assetList, newAsset]);
+    setShowAddModal(false);
+  };
+
 
   return (
     <IonPage>
@@ -68,10 +71,11 @@ const Tab1: React.FC = () => {
             </IonRow>
           </IonGrid>
         </IonItem>
-        <IonItem>
-          <IonGrid>
-            {assetList.map(function (asset, index) {
-              return (
+        {/* Map out asset list components */}
+        {assetList.map(function (asset, index) {
+          return (
+            <IonItem>
+              <IonGrid>
                 <IonRow key={index}>
                   <IonCol>
                     <IonLabel>{asset["Name"]}</IonLabel>
@@ -83,21 +87,10 @@ const Tab1: React.FC = () => {
                     <IonLabel>{asset["Currency"]}</IonLabel>
                   </IonCol>
                 </IonRow>
-              );
-            })}
-            {/* <IonRow>
-              <IonCol>
-                <IonLabel>Assert1</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>100</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>CAD</IonLabel>
-              </IonCol>
-            </IonRow> */}
-          </IonGrid>
-        </IonItem>
+              </IonGrid>
+            </IonItem>
+          );
+        })}
         <IonItem>
           {/* <IonButton size="small" fill="solid" href="/tab2"> */}
           <IonButton
@@ -114,15 +107,15 @@ const Tab1: React.FC = () => {
             <IonItem>
               <IonLabel position="floating">Name</IonLabel>
               {/* the floating will float the label */}
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetName(e.detail.value);}} ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetQuant(e.detail.value);}}></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
-              <IonInput></IonInput>
+              <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput>
             </IonItem>
             <IonRow>
               <IonCol size="6">
@@ -142,7 +135,7 @@ const Tab1: React.FC = () => {
                 <IonButton
                   expand="block"
                   color="success"
-                  href="/tab1?name=hi&quantity=100&currency=cad"
+                  onClick={() => onAssetSubmit()}
                 >
                   Add
                 </IonButton>
@@ -155,4 +148,4 @@ const Tab1: React.FC = () => {
   );
 };
 
-export default Tab1;
+export default Main;
