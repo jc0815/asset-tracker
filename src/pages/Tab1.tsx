@@ -110,43 +110,45 @@ const Tab1: React.FC = () => {
         </IonItem>
 
         <IonModal isOpen={showAddModal} cssClass="addModal">
-          <IonItem>
-            <IonLabel position="floating">Name</IonLabel>
-            {/* the floating will float the label */}
-            <IonInput></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Quantity</IonLabel>
-            <IonInput></IonInput>
-          </IonItem>
-          <IonItem>
-            <IonLabel position="floating">Currency</IonLabel>
-            <IonInput></IonInput>
-          </IonItem>
-          <IonRow>
-            <IonCol size="6">
-              <IonButton
-                onClick={() => setShowAddModal(false)}
-                expand="block"
-                fill="outline"
-                size="default"
-                color="medium"
-                href="/"
-              >
-                {/* size = small,default and large */}
-                Cancel
-              </IonButton>
-            </IonCol>
-            <IonCol size="6">
-              <IonButton
-                expand="block"
-                color="success"
-                href="/tab1?name=hi&quantity=100&currency=cad"
-              >
-                Add
-              </IonButton>
-            </IonCol>
-          </IonRow>
+          <div className="addModalContent">
+            <IonItem>
+              <IonLabel position="floating">Name</IonLabel>
+              {/* the floating will float the label */}
+              <IonInput></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Quantity</IonLabel>
+              <IonInput></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Currency</IonLabel>
+              <IonInput></IonInput>
+            </IonItem>
+            <IonRow>
+              <IonCol size="6">
+                <IonButton
+                  onClick={() => setShowAddModal(false)}
+                  expand="block"
+                  fill="outline"
+                  size="default"
+                  color="medium"
+                  href="/"
+                >
+                  {/* size = small,default and large */}
+                  Cancel
+                </IonButton>
+              </IonCol>
+              <IonCol size="6">
+                <IonButton
+                  expand="block"
+                  color="success"
+                  href="/tab1?name=hi&quantity=100&currency=cad"
+                >
+                  Add
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </div>
         </IonModal>
       </IonContent>
     </IonPage>
