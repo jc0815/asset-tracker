@@ -102,17 +102,6 @@ const Tab1: React.FC = () => {
             </IonItemSliding>
           );
         })}
-        {/* <IonRow>
-              <IonCol>
-                <IonLabel>Assert1</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>100</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>CAD</IonLabel>
-              </IonCol>
-            </IonRow> */}
 
         <IonItem>
           {/* <IonButton size="small" fill="solid" href="/tab2"> */}
