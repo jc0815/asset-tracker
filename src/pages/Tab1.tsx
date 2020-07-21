@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   IonContent,
   IonHeader,
@@ -12,11 +12,15 @@ import {
   IonLabel,
   IonCol,
   IonGrid,
+  IonModal,
+  IonInput,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 const Tab1: React.FC = () => {
+  const [showAddModal, setShowAddModal] = useState(false);
+
   var assetList = [
     {
       Name: "Asset1",
@@ -95,10 +99,55 @@ const Tab1: React.FC = () => {
           </IonGrid>
         </IonItem>
         <IonItem>
-          <IonButton size="small" fill="solid" href="/tab2">
+          {/* <IonButton size="small" fill="solid" href="/tab2"> */}
+          <IonButton
+            size="small"
+            fill="solid"
+            onClick={() => setShowAddModal(true)}
+          >
             <IonIcon icon={addCircleOutline}></IonIcon>
           </IonButton>
         </IonItem>
+
+        <IonModal isOpen={showAddModal} cssClass="addModal">
+          <IonItem>
+            <IonLabel position="floating">Name</IonLabel>
+            {/* the floating will float the label */}
+            <IonInput></IonInput>
+          </IonItem>
+          <IonItem>
+            <IonLabel position="floating">Quantity</IonLabel>
+            <IonInput></IonInput>
+          </IonItem>
+          <IonItem>
+            <IonLabel position="floating">Currency</IonLabel>
+            <IonInput></IonInput>
+          </IonItem>
+          <IonRow>
+            <IonCol size="6">
+              <IonButton
+                onClick={() => setShowAddModal(false)}
+                expand="block"
+                fill="outline"
+                size="default"
+                color="medium"
+                href="/"
+              >
+                {/* size = small,default and large */}
+                Cancel
+              </IonButton>
+            </IonCol>
+            <IonCol size="6">
+              <IonButton
+                expand="block"
+                color="success"
+                href="/tab1?name=hi&quantity=100&currency=cad"
+              >
+                Add
+              </IonButton>
+            </IonCol>
+          </IonRow>
+        </IonModal>
       </IonContent>
     </IonPage>
   );

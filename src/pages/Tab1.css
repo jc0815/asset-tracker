@@ -1,3 +1,9 @@
 .settingIcon {
   display: flex;
 }
+.addModal {
+  padding: 40% 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
