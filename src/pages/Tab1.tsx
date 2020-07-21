@@ -14,6 +14,10 @@ import {
   IonGrid,
   IonModal,
   IonInput,
+  IonList,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
@@ -68,24 +72,37 @@ const Tab1: React.FC = () => {
             </IonRow>
           </IonGrid>
         </IonItem>
-        <IonItem>
-          <IonGrid>
-            {assetList.map(function (asset, index) {
-              return (
-                <IonRow key={index}>
-                  <IonCol>
-                    <IonLabel>{asset["Name"]}</IonLabel>
-                  </IonCol>
-                  <IonCol>
-                    <IonLabel>{asset["Quantity"]}</IonLabel>
-                  </IonCol>
-                  <IonCol>
-                    <IonLabel>{asset["Currency"]}</IonLabel>
-                  </IonCol>
-                </IonRow>
-              );
-            })}
-            {/* <IonRow>
+
+        {assetList.map(function (asset, index) {
+          return (
+            <IonItemSliding>
+              <IonItem>
+                <IonGrid>
+                  <IonRow key={index}>
+                    <IonCol>
+                      <IonLabel>{asset["Name"]}</IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonLabel>{asset["Quantity"]}</IonLabel>
+                    </IonCol>
+                    <IonCol>
+                      <IonLabel>{asset["Currency"]}</IonLabel>
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonItem>
+              <IonItemOptions side="end">
+                <IonItemOption
+                  onClick={() => console.log("unread clicked")}
+                  color="danger"
+                >
+                  Delete
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
+          );
+        })}
+        {/* <IonRow>
               <IonCol>
                 <IonLabel>Assert1</IonLabel>
               </IonCol>
@@ -96,8 +113,7 @@ const Tab1: React.FC = () => {
                 <IonLabel>CAD</IonLabel>
               </IonCol>
             </IonRow> */}
-          </IonGrid>
-        </IonItem>
+
         <IonItem>
           {/* <IonButton size="small" fill="solid" href="/tab2"> */}
           <IonButton
@@ -110,7 +126,7 @@ const Tab1: React.FC = () => {
         </IonItem>
 
         <IonModal isOpen={showAddModal} cssClass="addModal">
-          <div className="addModalContent">
+          <IonList lines="full">
             <IonItem>
               <IonLabel position="floating">Name</IonLabel>
               {/* the floating will float the label */}
@@ -148,7 +164,7 @@ const Tab1: React.FC = () => {
                 </IonButton>
               </IonCol>
             </IonRow>
-          </div>
+          </IonList>
         </IonModal>
       </IonContent>
     </IonPage>
