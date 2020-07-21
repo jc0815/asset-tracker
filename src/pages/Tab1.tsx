@@ -15,7 +15,7 @@ import {
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
-import { settingsOutline, addCircleOutline } from "ionicons/icons";
+import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 const Tab1: React.FC = () => {
   return (
     <IonPage>
@@ -23,9 +23,7 @@ const Tab1: React.FC = () => {
         <IonToolbar color="primary">
           <IonRow>
             <IonTitle>Virtual Wallet</IonTitle>
-            <IonButton size="small" fill="solid">
-              <IonIcon icon={settingsOutline}></IonIcon>
-            </IonButton>
+            <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon>
           </IonRow>
         </IonToolbar>
       </IonHeader>
@@ -57,15 +55,15 @@ const Tab1: React.FC = () => {
               </IonCol>
               <IonCol>
                 <IonLabel>cad 100</IonLabel>
+                <IonIcon slot="end" icon={closeCircle}></IonIcon>
               </IonCol>
             </IonRow>
           </IonGrid>
         </IonItem>
-        <IonItem>
-          <IonButton size="small" fill="solid">
-            <IonIcon icon={addCircleOutline}></IonIcon>
-          </IonButton>
-        </IonItem>
+
+        <IonButton expand="block" color="warning">
+          <IonIcon icon={addCircleOutline}></IonIcon>
+        </IonButton>
       </IonContent>
     </IonPage>
   );
