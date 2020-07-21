@@ -18,6 +18,7 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  IonFooter,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
@@ -39,16 +40,16 @@ const Tab1: React.FC = () => {
 
   const onAssetSubmit = () => {
     const newAsset = {
-      "Name": newAssetName,
-      "Quantity": newAssetQuant,
-      "Currency": newAssetCurrency.toUpperCase()
+      Name: newAssetName,
+      Quantity: newAssetQuant,
+      Currency: newAssetCurrency.toUpperCase(),
     };
-    setAssetList(assetList => [...assetList, newAsset]);
+    setAssetList((assetList) => [...assetList, newAsset]);
     setShowAddModal(false);
   };
 
-  const deleteAsset = (asset : any) => {
-    setAssetList(assetList.filter(item => item["Name"] !== asset["Name"]));
+  const deleteAsset = (asset: any) => {
+    setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
   };
 
   return (
@@ -128,15 +129,27 @@ const Tab1: React.FC = () => {
             <IonItem>
               <IonLabel position="floating">Name</IonLabel>
               {/* the floating will float the label */}
-              <IonInput onIonChange={(e:any)=>{setNewAssetName(e.detail.value);}} ></IonInput>
+              <IonInput
+                onIonChange={(e: any) => {
+                  setNewAssetName(e.detail.value);
+                }}
+              ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
-              <IonInput onIonChange={(e:any)=>{setNewAssetQuant(e.detail.value);}}></IonInput>
+              <IonInput
+                onIonChange={(e: any) => {
+                  setNewAssetQuant(e.detail.value);
+                }}
+              ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
-              <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput>
+              <IonInput
+                onIonChange={(e: any) => {
+                  setNewAssetCurrency(e.detail.value);
+                }}
+              ></IonInput>
             </IonItem>
             <IonRow>
               <IonCol size="6">
@@ -164,6 +177,17 @@ const Tab1: React.FC = () => {
             </IonRow>
           </IonList>
         </IonModal>
+
+        <IonFooter>
+          <IonToolbar>
+            <IonTitle>Click to Add Text</IonTitle>
+            {/* <ion-buttons slot="end">
+              <ion-button id="changeText" onClick="toggleText()">
+                <ion-icon slot="start" name="refresh"></ion-icon>
+              </ion-button>
+            </ion-buttons> */}
+          </IonToolbar>
+        </IonFooter>
       </IonContent>
     </IonPage>
   );
