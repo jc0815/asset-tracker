@@ -20,7 +20,7 @@ import {
   IonItemOption,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
-import "./Tab1.css";
+import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 const Tab1: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -56,7 +56,7 @@ const Tab1: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {/*-- Default Item --*/}
+        {/*-- title of the list --*/}
         <IonItem>
           <IonGrid>
             <IonRow>
@@ -73,6 +73,7 @@ const Tab1: React.FC = () => {
           </IonGrid>
         </IonItem>
 
+        {/* list showing assets */}
         {assetList.map(function (asset, index) {
           return (
             <IonItemSliding>
@@ -103,6 +104,7 @@ const Tab1: React.FC = () => {
           );
         })}
 
+        {/* add button icon */}
         <IonItem>
           {/* <IonButton size="small" fill="solid" href="/tab2"> */}
           <IonButton
@@ -114,6 +116,7 @@ const Tab1: React.FC = () => {
           </IonButton>
         </IonItem>
 
+        {/* addModal */}
         <IonModal isOpen={showAddModal} cssClass="addModal">
           <IonList lines="full">
             <IonItem>
