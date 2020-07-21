@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   IonContent,
   IonHeader,
@@ -18,11 +18,15 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  useIonViewDidEnter
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
-const Tab1: React.FC = () => {
+import { Plugins } from '@capacitor/core';
+
+const Main: React.FC = () => {
+
   const [showAddModal, setShowAddModal] = useState(false);
 
   const exampleAsset = {
@@ -37,18 +41,46 @@ const Tab1: React.FC = () => {
   const [newAssetQuant, setNewAssetQuant] = useState("");
   const [newAssetCurrency, setNewAssetCurrency] = useState("");
 
+  useEffect(() => {
+    Storage.get({ key: 'assets' }).then((ret) => {
+      var returnValue = JSON.parse(ret.value || '{}');
+      var newList : any = [];
+      for (let asset in returnValue) {
+        newList.push({
+          Name: returnValue[asset].Name,
+          Quantity: returnValue[asset].Quantity,
+          Currency: returnValue[asset].Currency
+        });
+      }
+      if (newList.length > 1) {
+        setAssetList(newList);
+      }
+    });
+  });
+
   const onAssetSubmit = () => {
     const newAsset = {
-      "Name": newAssetName,
-      "Quantity": newAssetQuant,
-      "Currency": newAssetCurrency.toUpperCase()
+      Name: newAssetName,
+      Quantity: newAssetQuant,
+      Currency: newAssetCurrency.toUpperCase()
     };
     setAssetList(assetList => [...assetList, newAsset]);
     setShowAddModal(false);
+    setAssetsStorage();
   };
 
   const deleteAsset = (asset : any) => {
     setAssetList(assetList.filter(item => item["Name"] !== asset["Name"]));
+  };
+
+  const { Storage } = Plugins;
+
+  // save assets to local storage
+  async function setAssetsStorage() {
+    await Storage.set({
+      key: 'assets',
+      value: JSON.stringify(assetList)
+    });
   };
 
   return (
@@ -82,10 +114,10 @@ const Tab1: React.FC = () => {
         {/* list showing assets */}
         {assetList.map(function (asset, index) {
           return (
-            <IonItemSliding>
+            <IonItemSliding key={index}>
               <IonItem>
                 <IonGrid>
-                  <IonRow key={index}>
+                  <IonRow>
                     <IonCol>
                       <IonLabel>{asset["Name"]}</IonLabel>
                     </IonCol>
@@ -169,4 +201,4 @@ const Tab1: React.FC = () => {
   );
 };
 
-export default Tab1;
+export default Main;
