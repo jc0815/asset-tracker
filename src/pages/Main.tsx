@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   IonContent,
   IonHeader,
@@ -25,9 +25,17 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
+import { AssertionError } from "assert";
+import { forceUpdate } from "ionicons/dist/types/stencil-public-runtime";
 
 const Main: React.FC = () => {
+  const { Storage } = Plugins;
+
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const inputName = useRef<HTMLIonInputElement>(null);
+  const inputQuantity = useRef<HTMLIonInputElement>(null);
+  const inputCurrency = useRef<HTMLIonInputElement>(null);
 
   const exampleAsset = {
     Name: "Example1",
@@ -35,53 +43,134 @@ const Main: React.FC = () => {
     Currency: "CAD",
   };
 
-  const [assetList, setAssetList] = useState([exampleAsset]);
+  const [assetList, setAssetList] = useState<
+    { key: ""; Name: ""; Quantity: ""; Currency: "" }[] | null
+  >(null);
 
-  const [newAssetName, setNewAssetName] = useState("");
-  const [newAssetQuant, setNewAssetQuant] = useState("");
-  const [newAssetCurrency, setNewAssetCurrency] = useState("");
+  const [index, setIndex] = useState(1);
+
+  // useEffect(() => {
+  //   Storage.get({ key: "assets" }).then((ret) => {
+  //     var returnValue = JSON.parse(ret.value || "{}");
+  //     var newList: any = [];
+  //     for (let asset in returnValue) {
+  //       newList.push({
+  //         Name: returnValue[asset].Name,
+  //         Quantity: returnValue[asset].Quantity,
+  //         Currency: returnValue[asset].Currency,
+  //       });
+  //     }
+  //     if (newList.length > 1) {
+  //       setAssetList(newList);
+  //     }
+  //   });
+  // });
 
   useEffect(() => {
-    Storage.get({ key: "assets" }).then((ret) => {
-      var returnValue = JSON.parse(ret.value || "{}");
-      var newList: any = [];
-      for (let asset in returnValue) {
-        newList.push({
-          Name: returnValue[asset].Name,
-          Quantity: returnValue[asset].Quantity,
-          Currency: returnValue[asset].Currency,
+    const tempList: { key: ""; Name: ""; Quantity: ""; Currency: "" }[] = [];
+    if (assetList === null) {
+      console.log("the assert is null");
+      keys().then((retKeys) => {
+        // console.log("keys are ", retKeys);
+        retKeys.forEach((key) => {
+          getObject(key).then((value) => {
+            tempList.push(value);
+          });
         });
-      }
-      if (newList.length > 1) {
-        setAssetList(newList);
-      }
-    });
-  });
+        setAssetList(tempList);
+      });
+      console.log("the tempList is ", tempList);
+    }
+  }, []);
 
-  const onAssetSubmit = () => {
+  useEffect(() => {
+    console.log("it's updateing");
+  }, [assetList]);
+
+  const onAssetSubmit = (name: String, quantity: Number, currency: String) => {
+    clear();
+    console.log(inputCurrency.current?.value);
     const newAsset = {
-      Name: newAssetName,
-      Quantity: newAssetQuant,
-      Currency: newAssetCurrency.toUpperCase(),
+      key: index + "",
+      Name: inputName.current?.value,
+      Quantity: inputQuantity.current?.value,
+      Currency: inputCurrency.current?.value,
     };
-    setAssetList((assetList) => [...assetList, newAsset]);
-    setShowAddModal(false);
-    setAssetsStorage();
+    //setAssetList((assetList) => [...assetList, newAsset]);
+    setAssetsStorage(newAsset).then(() => {
+      setShowAddModal(false);
+      const tempIndex = index + 1;
+      setIndex(tempIndex);
+    });
   };
 
-  const deleteAsset = (asset: any) => {
-    setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
-  };
-
-  const { Storage } = Plugins;
+  // const deleteAsset = (asset: any) => {
+  //   setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
+  // };
 
   // save assets to local storage
-  async function setAssetsStorage() {
+  async function setAssetsStorage(newAsset: any) {
+    //console.log(newAsset);
     await Storage.set({
-      key: "assets",
-      value: JSON.stringify(assetList),
+      key: newAsset.key,
+      value: JSON.stringify(newAsset),
     });
   }
+
+  //
+  // JSON "get" example
+  async function getObject(key: any) {
+    const ret = await Storage.get({ key: key });
+    const value = JSON.parse(ret.value || "{}");
+    return value;
+  }
+  // clear all items
+  async function clear() {
+    await Storage.clear();
+  }
+  // get all the keys from the storage
+  async function keys() {
+    const { keys } = await Storage.keys();
+    console.log("Got keys: ", keys);
+    return keys;
+  }
+
+  const renderAssetList = () => {
+    if (assetList === null) {
+      console.log("render : assetList is null");
+      return <p>hellooo</p>;
+    } else {
+      return assetList?.map((asset, index) => {
+        return (
+          <IonItemSliding key={index}>
+            <IonItem>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>
+                    <IonLabel>{asset["Name"]}</IonLabel>
+                  </IonCol>
+                  <IonCol>
+                    <IonLabel>{asset["Quantity"]}</IonLabel>
+                  </IonCol>
+                  <IonCol>
+                    <IonLabel>{asset["Currency"]}</IonLabel>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonItem>
+            <IonItemOptions side="end">
+              <IonItemOption
+                // onClick={() => deleteAsset(asset)}
+                color="danger"
+              >
+                Delete
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+        );
+      });
+    }
+  };
 
   return (
     <IonPage>
@@ -112,35 +201,7 @@ const Main: React.FC = () => {
         </IonItem>
 
         {/* list showing assets */}
-        {assetList.map(function (asset, index) {
-          return (
-            <IonItemSliding key={index}>
-              <IonItem>
-                <IonGrid>
-                  <IonRow>
-                    <IonCol>
-                      <IonLabel>{asset["Name"]}</IonLabel>
-                    </IonCol>
-                    <IonCol>
-                      <IonLabel>{asset["Quantity"]}</IonLabel>
-                    </IonCol>
-                    <IonCol>
-                      <IonLabel>{asset["Currency"]}</IonLabel>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
-              </IonItem>
-              <IonItemOptions side="end">
-                <IonItemOption
-                  onClick={() => deleteAsset(asset)}
-                  color="danger"
-                >
-                  Delete
-                </IonItemOption>
-              </IonItemOptions>
-            </IonItemSliding>
-          );
-        })}
+        {renderAssetList()}
 
         {/* add button icon */}
         <IonItem>
@@ -148,7 +209,10 @@ const Main: React.FC = () => {
           <IonButton
             size="small"
             fill="solid"
-            onClick={() => setShowAddModal(true)}
+            onClick={() => {
+              setShowAddModal(true);
+              console.log("the assertlist is ", assetList);
+            }}
           >
             <IonIcon icon={addCircleOutline}></IonIcon>
           </IonButton>
@@ -161,36 +225,41 @@ const Main: React.FC = () => {
               <IonLabel position="floating">Name</IonLabel>
               {/* the floating will float the label */}
               <IonInput
-                onIonChange={(e: any) => {
-                  setNewAssetName(e.detail.value);
-                }}
+                ref={inputName}
+                // onIonChange={(e: any) => {
+                //   setNewAssetName(e.detail.value);
+                // }}
               ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
               <IonInput
-                onIonChange={(e: any) => {
-                  setNewAssetQuant(e.detail.value);
-                }}
+                ref={inputQuantity}
+                // onIonChange={(e: any) => {
+                //   setNewAssetQuant(e.detail.value);
+                // }}
               ></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
               <IonInput
-                onIonChange={(e: any) => {
-                  setNewAssetCurrency(e.detail.value);
-                }}
+                // onIonChange={(e: any) => {
+                //   setNewAssetCurrency(e.detail.value);
+                // }}
+                ref={inputCurrency}
               ></IonInput>
             </IonItem>
             <IonRow>
               <IonCol size="6">
                 <IonButton
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    console.log("the assertlist is ", assetList);
+                  }}
                   expand="block"
                   fill="outline"
                   size="default"
                   color="medium"
-                  href="/"
                 >
                   {/* size = small,default and large */}
                   Cancel
@@ -200,7 +269,7 @@ const Main: React.FC = () => {
                 <IonButton
                   expand="block"
                   color="success"
-                  onClick={() => onAssetSubmit()}
+                  onClick={() => onAssetSubmit("apple", 10, "CAD")}
                 >
                   Add
                 </IonButton>
