@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   IonContent,
   IonHeader,
@@ -18,11 +18,19 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  IonFooter
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
+import { Plugins } from "@capacitor/core";
+
+
 const Tab1: React.FC = () => {
+  const [loadCount, setLoadCount] = useState(0);
+
+  const { Storage } = Plugins;
+
   const [showAddModal, setShowAddModal] = useState(false);
 
   const exampleAsset = {
@@ -31,6 +39,14 @@ const Tab1: React.FC = () => {
     Currency: "CAD",
   };
 
+  // save assets to local storage
+  async function setAssetsStorage() {
+    await Storage.set({
+      key: "assets",
+      value: JSON.stringify(assetList),
+    });
+  }
+
   const [assetList, setAssetList] = useState([exampleAsset]);
 
   const [newAssetName, setNewAssetName] = useState("");
@@ -38,6 +54,7 @@ const Tab1: React.FC = () => {
   const [newAssetCurrency, setNewAssetCurrency] = useState("");
 
   const onAssetSubmit = () => {
+    console.log("submit");
     const newAsset = {
       "Name": newAssetName,
       "Quantity": newAssetQuant,
@@ -45,10 +62,39 @@ const Tab1: React.FC = () => {
     };
     setAssetList(assetList => [...assetList, newAsset]);
     setShowAddModal(false);
+    // console.log(assetList);
   };
+
+  useEffect(() => {
+    if (loadCount >= 1) {
+      console.log("set asset list: " + JSON.stringify(assetList));
+      setAssetsStorage();
+    }
+ }, [assetList]);
+
+  // on load
+  useEffect(() => {
+    Storage.get({ key: "assets" }).then((ret) => {
+      var returnValue = JSON.parse(ret.value || "{}");
+      var newList: any = [];
+      for (let asset in returnValue) {
+        newList.push({
+          Name: returnValue[asset].Name,
+          Quantity: returnValue[asset].Quantity,
+          Currency: returnValue[asset].Currency,
+        });
+      }
+      if (newList.length > 1) {
+        setAssetList(newList);
+      }
+      console.log("Retrieved list: " + JSON.stringify(newList));
+      setLoadCount(1);
+    });
+  }, []);
 
   const deleteAsset = (asset : any) => {
     setAssetList(assetList.filter(item => item["Name"] !== asset["Name"]));
+    setAssetsStorage();
   };
 
   return (
@@ -165,6 +211,16 @@ const Tab1: React.FC = () => {
           </IonList>
         </IonModal>
       </IonContent>
+      <IonFooter>
+        <IonToolbar>
+          <IonTitle>Click to Add Text</IonTitle>
+          {/* <ion-buttons slot="end">
+            <ion-button id="changeText" onClick="toggleText()">
+              <ion-icon slot="start" name="refresh"></ion-icon>
+              </ion-button>
+          </ion-buttons> */}
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };
