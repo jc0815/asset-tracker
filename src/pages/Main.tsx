@@ -97,10 +97,7 @@ const Main: React.FC = () => {
       // console.log("set asset list: " + JSON.stringify(assetList));
       setAssetsStorage();
     }
-  }, [assetList]);
 
-  // run everytime currencylist changes
-  useEffect(() => {
     let tempTotal = 0;
     console.log("useEffect: currenyList is ", currencyList);
     assetList.forEach((asset) => {
@@ -108,7 +105,7 @@ const Main: React.FC = () => {
     });
     console.log("useEffect: tempTotal is ", tempTotal);
     setTotal(tempTotal.toFixed(2));
-  }, [currencyList]);
+  }, [assetList, currencyList]);
 
   useEffect(() => {}, [currencyList]);
   // on function load set up
