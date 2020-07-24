@@ -18,7 +18,9 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
-  IonFooter
+  IonFooter,
+  IonSelect,
+  IonSelectOption
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
@@ -27,17 +29,21 @@ import { Plugins } from "@capacitor/core";
 
 
 const Tab1: React.FC = () => {
-  const [loadCount, setLoadCount] = useState(0);
-
   const { Storage } = Plugins;
-
-  const [showAddModal, setShowAddModal] = useState(false);
-
   const exampleAsset = {
     Name: "Example1",
-    Quantity: "100",
+    Quantity: 100,
     Currency: "CAD",
   };
+
+  const [loadCount, setLoadCount] = useState(0);
+  const [currencyList, setCurrencyList] = useState({});
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const [assetList, setAssetList] = useState([exampleAsset]);
+  const [newAssetName, setNewAssetName] = useState("");
+  const [newAssetQuant, setNewAssetQuant] = useState(0);
+  const [newAssetCurrency, setNewAssetCurrency] = useState("CAD");
 
   // save assets to local storage
   async function setAssetsStorage() {
@@ -47,12 +53,7 @@ const Tab1: React.FC = () => {
     });
   }
 
-  const [assetList, setAssetList] = useState([exampleAsset]);
-
-  const [newAssetName, setNewAssetName] = useState("");
-  const [newAssetQuant, setNewAssetQuant] = useState("");
-  const [newAssetCurrency, setNewAssetCurrency] = useState("");
-
+  // add a new asset
   const onAssetSubmit = () => {
     console.log("submit");
     const newAsset = {
@@ -62,17 +63,25 @@ const Tab1: React.FC = () => {
     };
     setAssetList(assetList => [...assetList, newAsset]);
     setShowAddModal(false);
-    // console.log(assetList);
+    resetModal();
   };
 
+  // reset modal values
+  const resetModal = () => {
+    setNewAssetName("");
+    setNewAssetQuant(0);
+    setNewAssetCurrency("CAD");
+  };
+
+  // run everytime assetList changes
   useEffect(() => {
     if (loadCount >= 1) {
-      console.log("set asset list: " + JSON.stringify(assetList));
+      // console.log("set asset list: " + JSON.stringify(assetList));
       setAssetsStorage();
     }
- }, [assetList]);
+  }, [assetList]);
 
-  // on load
+  // on function load set up
   useEffect(() => {
     Storage.get({ key: "assets" }).then((ret) => {
       var returnValue = JSON.parse(ret.value || "{}");
@@ -87,14 +96,37 @@ const Tab1: React.FC = () => {
       if (newList.length > 1) {
         setAssetList(newList);
       }
-      console.log("Retrieved list: " + JSON.stringify(newList));
+      // console.log("Retrieved list: " + JSON.stringify(newList));
       setLoadCount(1);
+      getCurrencyList();
     });
   }, []);
 
+  // deletes an asset in assetList
   const deleteAsset = (asset : any) => {
     setAssetList(assetList.filter(item => item["Name"] !== asset["Name"]));
-    setAssetsStorage();
+  };
+
+  const getCurrencyList = () => {
+    fetch("https://api.exchangeratesapi.io/latest")
+      .then((res) => {
+        return res.json();
+      }).then((response) => {
+        // Note: base is EUR
+        console.log(response["rates"]);
+        setCurrencyList(response["rates"]);
+        // TODO: store currency list to storage
+      }).catch((err) => {
+        // TODO: get existing storage currency list
+        console.log(err);
+      });
+  }
+
+  // convert currency
+  const convertCurrency = (fromCurrency: string, toCurrency: string, quantity: number) => {
+    var fromRate = parseFloat(Object(currencyList)[fromCurrency]);
+    var toRate = parseFloat(Object(currencyList)[toCurrency]);
+    return quantity * (toRate / fromRate);
   };
 
   return (
@@ -178,11 +210,16 @@ const Tab1: React.FC = () => {
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
-              <IonInput onIonChange={(e:any)=>{setNewAssetQuant(e.detail.value);}}></IonInput>
+              <IonInput type="number" onIonChange={(e:any)=>{setNewAssetQuant(e.detail.value);}}></IonInput>
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
-              <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput>
+              {/* <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput> */}
+              <IonSelect value={newAssetCurrency} placeholder="Default: CAD" onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}>
+                {Object.keys(currencyList).map((keyName, i) => (
+                  <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                ))}
+              </IonSelect>
             </IonItem>
             <IonRow>
               <IonCol size="6">
