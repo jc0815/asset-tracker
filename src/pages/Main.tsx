@@ -317,7 +317,11 @@ const Main: React.FC = () => {
                 ))}
               </IonSelect>
             </IonItem>
-            <IonRow>
+            <IonRow
+              className="cancelAdd
+            
+            "
+            >
               <IonCol size="6">
                 <IonButton
                   onClick={() => setShowAddModal(false)}
@@ -374,6 +378,12 @@ const Main: React.FC = () => {
                 placeholder="Default: CAD"
                 onIonChange={(e: any) => {
                   setNewAssetCurrency(e.detail.value);
+                  let tempQuantitiy = convertCurrency(
+                    currentEditingAsset["Currency"],
+                    e.detail.value,
+                    currentEditingAsset["Quantity"]
+                  );
+                  setNewAssetQuant(+tempQuantitiy.toFixed());
                 }}
               >
                 {Object.keys(currencyList).map((keyName, i) => (
@@ -381,10 +391,10 @@ const Main: React.FC = () => {
                 ))}
               </IonSelect>
             </IonItem>
-            <IonRow>
+            <IonRow className="cancelAdd">
               <IonCol size="6">
                 <IonButton
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => setShowEditModal(false)}
                   expand="block"
                   fill="outline"
                   size="default"
