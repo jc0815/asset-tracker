@@ -25,7 +25,7 @@ import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 
-const Tab1: React.FC = () => {
+const Main: React.FC = () => {
   const [loadCount, setLoadCount] = useState(0);
 
   const { Storage } = Plugins;
@@ -112,16 +112,6 @@ const Tab1: React.FC = () => {
     setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
     setAssetsStorage();
   };
-
-  const { Storage } = Plugins;
-
-  // save assets to local storage
-  async function setAssetsStorage() {
-    await Storage.set({
-      key: "assets",
-      value: JSON.stringify(assetList),
-    });
-  }
 
   return (
     <IonPage>
