@@ -18,7 +18,6 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
-  useIonViewDidEnter,
   IonFooter,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
@@ -26,7 +25,11 @@ import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 
-const Main: React.FC = () => {
+const Tab1: React.FC = () => {
+  const [loadCount, setLoadCount] = useState(0);
+
+  const { Storage } = Plugins;
+
   const [showAddModal, setShowAddModal] = useState(false);
 
   const exampleAsset = {
@@ -34,6 +37,14 @@ const Main: React.FC = () => {
     Quantity: "100",
     Currency: "CAD",
   };
+
+  // save assets to local storage
+  async function setAssetsStorage() {
+    await Storage.set({
+      key: "assets",
+      value: JSON.stringify(assetList),
+    });
+  }
 
   const [assetList, setAssetList] = useState([exampleAsset]);
 
@@ -59,6 +70,7 @@ const Main: React.FC = () => {
   });
 
   const onAssetSubmit = () => {
+    console.log("submit");
     const newAsset = {
       Name: newAssetName,
       Quantity: newAssetQuant,
@@ -66,11 +78,39 @@ const Main: React.FC = () => {
     };
     setAssetList((assetList) => [...assetList, newAsset]);
     setShowAddModal(false);
-    setAssetsStorage();
+    // console.log(assetList);
   };
+
+  useEffect(() => {
+    if (loadCount >= 1) {
+      console.log("set asset list: " + JSON.stringify(assetList));
+      setAssetsStorage();
+    }
+  }, [assetList]);
+
+  // on load
+  useEffect(() => {
+    Storage.get({ key: "assets" }).then((ret) => {
+      var returnValue = JSON.parse(ret.value || "{}");
+      var newList: any = [];
+      for (let asset in returnValue) {
+        newList.push({
+          Name: returnValue[asset].Name,
+          Quantity: returnValue[asset].Quantity,
+          Currency: returnValue[asset].Currency,
+        });
+      }
+      if (newList.length > 1) {
+        setAssetList(newList);
+      }
+      console.log("Retrieved list: " + JSON.stringify(newList));
+      setLoadCount(1);
+    });
+  }, []);
 
   const deleteAsset = (asset: any) => {
     setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
+    setAssetsStorage();
   };
 
   const { Storage } = Plugins;
@@ -220,6 +260,16 @@ const Main: React.FC = () => {
           </IonToolbar>
         </IonFooter>
       </IonContent>
+      <IonFooter>
+        <IonToolbar>
+          <IonTitle>Click to Add Text</IonTitle>
+          {/* <ion-buttons slot="end">
+            <ion-button id="changeText" onClick="toggleText()">
+              <ion-icon slot="start" name="refresh"></ion-icon>
+              </ion-button>
+          </ion-buttons> */}
+        </IonToolbar>
+      </IonFooter>
     </IonPage>
   );
 };
