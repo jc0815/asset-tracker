@@ -38,6 +38,13 @@ const Main: React.FC = () => {
   const [loadCount, setLoadCount] = useState(0);
   const [currencyList, setCurrencyList] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentEditingAsset, setCurrentEditingAsset] = useState({
+    Name: "Example1",
+    Quantity: 100,
+    Currency: "CAD",
+    Index: 1,
+  });
 
   const [assetList, setAssetList] = useState([exampleAsset]);
   const [newAssetName, setNewAssetName] = useState("");
@@ -63,6 +70,16 @@ const Main: React.FC = () => {
     setAssetList((assetList) => [...assetList, newAsset]);
     setShowAddModal(false);
     resetModal();
+  };
+
+  //edit current asset
+  const onAssetEdit = () => {
+    let currentAsset = assetList[currentEditingAsset["Index"]];
+    currentAsset["Name"] = newAssetName;
+    currentAsset["Quantity"] = newAssetQuant;
+    currentAsset["Currency"] = newAssetCurrency;
+    setAssetList((assetList) => [...assetList]);
+    setShowEditModal(false);
   };
 
   // reset modal values
@@ -106,6 +123,7 @@ const Main: React.FC = () => {
     setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
   };
 
+  //get the currency list
   const getCurrencyList = () => {
     fetch("https://api.exchangeratesapi.io/latest")
       .then((res) => {
@@ -113,16 +131,51 @@ const Main: React.FC = () => {
       })
       .then((response) => {
         // Note: base is EUR
-        console.log(response["rates"]);
+        //console.log(response["rates"]);
         setCurrencyList(response["rates"]);
         // TODO: store currency list to storage
+        setCurrencyStorage(response["rates"]);
       })
       .catch((err) => {
         // TODO: get existing storage currency list
+        // if fetching fails set the currnecyList using the storage
+        getAssetsStorage().then((res) => {
+          setCurrencyList(res);
+        });
         console.log(err);
       });
   };
 
+  //render edit asset
+  const renderEditAsset = (
+    name: string,
+    quantity: number,
+    currency: string,
+    index: number
+  ) => {
+    const temp = {
+      Name: name,
+      Quantity: quantity,
+      Currency: currency,
+      Index: index,
+    };
+    setCurrentEditingAsset(temp);
+    setShowEditModal(true);
+  };
+
+  //store currency list to storage
+  async function setCurrencyStorage(currencyList: any) {
+    await Storage.set({
+      key: "currency",
+      value: JSON.stringify(currencyList),
+    });
+  }
+  //get currency storage
+  const getAssetsStorage = () => {
+    return Storage.get({ key: "currency" }).then((response) => {
+      return response;
+    });
+  };
   // convert currency
   const convertCurrency = (
     fromCurrency: string,
@@ -166,7 +219,16 @@ const Main: React.FC = () => {
         {assetList.map(function (asset, index) {
           return (
             <IonItemSliding key={index}>
-              <IonItem>
+              <IonItem
+                onClick={() =>
+                  renderEditAsset(
+                    asset["Name"],
+                    asset["Quantity"],
+                    asset["Currency"],
+                    index
+                  )
+                }
+              >
                 <IonGrid>
                   <IonRow>
                     <IonCol>
@@ -268,16 +330,71 @@ const Main: React.FC = () => {
           </IonList>
         </IonModal>
 
-        <IonFooter>
-          <IonToolbar>
-            <IonTitle>Click to Add Text</IonTitle>
-            {/* <ion-buttons slot="end">
-              <ion-button id="changeText" onClick="toggleText()">
-                <ion-icon slot="start" name="refresh"></ion-icon>
-              </ion-button>
-            </ion-buttons> */}
-          </IonToolbar>
-        </IonFooter>
+        {/* edit modal */}
+        <IonModal isOpen={showEditModal} cssClass="addModal">
+          <IonList lines="full">
+            <IonItem>
+              <IonLabel position="floating">Name</IonLabel>
+              {/* the floating will float the label */}
+              <IonInput
+                placeholder={currentEditingAsset["Name"]}
+                onIonChange={(e: any) => {
+                  setNewAssetName(e.detail.value);
+                }}
+              ></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Quantity</IonLabel>
+              <IonInput
+                placeholder={currentEditingAsset["Quantity"] + ""}
+                type="number"
+                onIonChange={(e: any) => {
+                  setNewAssetQuant(e.detail.value);
+                }}
+              ></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Currency</IonLabel>
+              {/* <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput> */}
+              <IonSelect
+                value={newAssetCurrency}
+                placeholder="Default: CAD"
+                onIonChange={(e: any) => {
+                  setNewAssetCurrency(e.detail.value);
+                }}
+              >
+                {Object.keys(currencyList).map((keyName, i) => (
+                  <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                ))}
+              </IonSelect>
+            </IonItem>
+            <IonRow>
+              <IonCol size="6">
+                <IonButton
+                  onClick={() => setShowAddModal(false)}
+                  expand="block"
+                  fill="outline"
+                  size="default"
+                  color="medium"
+                  href="/"
+                >
+                  {/* size = small,default and large */}
+                  Cancel
+                </IonButton>
+              </IonCol>
+              <IonCol size="6">
+                <IonButton
+                  expand="block"
+                  color="success"
+                  onClick={() => onAssetEdit()}
+                >
+                  Submit
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonList>
+        </IonModal>
+        {/* end of edit modal */}
       </IonContent>
       <IonFooter>
         <IonToolbar>
