@@ -19,6 +19,8 @@ import {
   IonItemOptions,
   IonItemOption,
   IonFooter,
+  IonSelect,
+  IonSelectOption,
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
@@ -26,17 +28,21 @@ import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
 
 const Main: React.FC = () => {
-  const [loadCount, setLoadCount] = useState(0);
-
   const { Storage } = Plugins;
-
-  const [showAddModal, setShowAddModal] = useState(false);
-
   const exampleAsset = {
     Name: "Example1",
-    Quantity: "100",
+    Quantity: 100,
     Currency: "CAD",
   };
+
+  const [loadCount, setLoadCount] = useState(0);
+  const [currencyList, setCurrencyList] = useState({});
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const [assetList, setAssetList] = useState([exampleAsset]);
+  const [newAssetName, setNewAssetName] = useState("");
+  const [newAssetQuant, setNewAssetQuant] = useState(0);
+  const [newAssetCurrency, setNewAssetCurrency] = useState("CAD");
 
   // save assets to local storage
   async function setAssetsStorage() {
@@ -46,29 +52,7 @@ const Main: React.FC = () => {
     });
   }
 
-  const [assetList, setAssetList] = useState([exampleAsset]);
-
-  const [newAssetName, setNewAssetName] = useState("");
-  const [newAssetQuant, setNewAssetQuant] = useState("");
-  const [newAssetCurrency, setNewAssetCurrency] = useState("");
-
-  useEffect(() => {
-    Storage.get({ key: "assets" }).then((ret) => {
-      var returnValue = JSON.parse(ret.value || "{}");
-      var newList: any = [];
-      for (let asset in returnValue) {
-        newList.push({
-          Name: returnValue[asset].Name,
-          Quantity: returnValue[asset].Quantity,
-          Currency: returnValue[asset].Currency,
-        });
-      }
-      if (newList.length > 1) {
-        setAssetList(newList);
-      }
-    });
-  });
-
+  // add a new asset
   const onAssetSubmit = () => {
     console.log("submit");
     const newAsset = {
@@ -78,17 +62,25 @@ const Main: React.FC = () => {
     };
     setAssetList((assetList) => [...assetList, newAsset]);
     setShowAddModal(false);
-    // console.log(assetList);
+    resetModal();
   };
 
+  // reset modal values
+  const resetModal = () => {
+    setNewAssetName("");
+    setNewAssetQuant(0);
+    setNewAssetCurrency("CAD");
+  };
+
+  // run everytime assetList changes
   useEffect(() => {
     if (loadCount >= 1) {
-      console.log("set asset list: " + JSON.stringify(assetList));
+      // console.log("set asset list: " + JSON.stringify(assetList));
       setAssetsStorage();
     }
   }, [assetList]);
 
-  // on load
+  // on function load set up
   useEffect(() => {
     Storage.get({ key: "assets" }).then((ret) => {
       var returnValue = JSON.parse(ret.value || "{}");
@@ -103,14 +95,43 @@ const Main: React.FC = () => {
       if (newList.length > 1) {
         setAssetList(newList);
       }
-      console.log("Retrieved list: " + JSON.stringify(newList));
+      // console.log("Retrieved list: " + JSON.stringify(newList));
       setLoadCount(1);
+      getCurrencyList();
     });
   }, []);
 
+  // deletes an asset in assetList
   const deleteAsset = (asset: any) => {
     setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
-    setAssetsStorage();
+  };
+
+  const getCurrencyList = () => {
+    fetch("https://api.exchangeratesapi.io/latest")
+      .then((res) => {
+        return res.json();
+      })
+      .then((response) => {
+        // Note: base is EUR
+        console.log(response["rates"]);
+        setCurrencyList(response["rates"]);
+        // TODO: store currency list to storage
+      })
+      .catch((err) => {
+        // TODO: get existing storage currency list
+        console.log(err);
+      });
+  };
+
+  // convert currency
+  const convertCurrency = (
+    fromCurrency: string,
+    toCurrency: string,
+    quantity: number
+  ) => {
+    var fromRate = parseFloat(Object(currencyList)[fromCurrency]);
+    var toRate = parseFloat(Object(currencyList)[toCurrency]);
+    return quantity * (toRate / fromRate);
   };
 
   return (
@@ -199,6 +220,7 @@ const Main: React.FC = () => {
             <IonItem>
               <IonLabel position="floating">Quantity</IonLabel>
               <IonInput
+                type="number"
                 onIonChange={(e: any) => {
                   setNewAssetQuant(e.detail.value);
                 }}
@@ -206,11 +228,18 @@ const Main: React.FC = () => {
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Currency</IonLabel>
-              <IonInput
+              {/* <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput> */}
+              <IonSelect
+                value={newAssetCurrency}
+                placeholder="Default: CAD"
                 onIonChange={(e: any) => {
                   setNewAssetCurrency(e.detail.value);
                 }}
-              ></IonInput>
+              >
+                {Object.keys(currencyList).map((keyName, i) => (
+                  <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                ))}
+              </IonSelect>
             </IonItem>
             <IonRow>
               <IonCol size="6">
