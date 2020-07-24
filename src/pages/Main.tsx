@@ -26,6 +26,7 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Main.css";
 import { settingsOutline, addCircleOutline, closeCircle } from "ionicons/icons";
 import { Plugins } from "@capacitor/core";
+import { AssertionError } from "assert";
 
 const Main: React.FC = () => {
   const { Storage } = Plugins;
@@ -36,6 +37,7 @@ const Main: React.FC = () => {
   };
 
   const [loadCount, setLoadCount] = useState(0);
+  const [total, setTotal] = useState(String);
   const [currencyList, setCurrencyList] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -97,9 +99,22 @@ const Main: React.FC = () => {
     }
   }, [assetList]);
 
+  // run everytime currencylist changes
+  useEffect(() => {
+    let tempTotal = 0;
+    console.log("useEffect: currenyList is ", currencyList);
+    assetList.forEach((asset) => {
+      tempTotal += convertCurrency(asset["Currency"], "CAD", asset["Quantity"]);
+    });
+    console.log("useEffect: tempTotal is ", tempTotal);
+    setTotal(tempTotal.toFixed(2));
+  }, [currencyList]);
+
+  useEffect(() => {}, [currencyList]);
   // on function load set up
   useEffect(() => {
     Storage.get({ key: "assets" }).then((ret) => {
+      getCurrencyList();
       var returnValue = JSON.parse(ret.value || "{}");
       var newList: any = [];
       for (let asset in returnValue) {
@@ -114,7 +129,6 @@ const Main: React.FC = () => {
       }
       // console.log("Retrieved list: " + JSON.stringify(newList));
       setLoadCount(1);
-      getCurrencyList();
     });
   }, []);
 
@@ -125,7 +139,7 @@ const Main: React.FC = () => {
 
   //get the currency list
   const getCurrencyList = () => {
-    fetch("https://api.exchangeratesapi.io/latest")
+    return fetch("https://api.exchangeratesapi.io/latest")
       .then((res) => {
         return res.json();
       })
@@ -134,7 +148,10 @@ const Main: React.FC = () => {
         //console.log(response["rates"]);
         setCurrencyList(response["rates"]);
         // TODO: store currency list to storage
+        //console.log(response["rates"]);
         setCurrencyStorage(response["rates"]);
+        // console.log("getCurrencyList: the currencyList is ", currencyList);
+        return response;
       })
       .catch((err) => {
         // TODO: get existing storage currency list
@@ -311,7 +328,6 @@ const Main: React.FC = () => {
                   fill="outline"
                   size="default"
                   color="medium"
-                  href="/"
                 >
                   {/* size = small,default and large */}
                   Cancel
@@ -376,7 +392,6 @@ const Main: React.FC = () => {
                   fill="outline"
                   size="default"
                   color="medium"
-                  href="/"
                 >
                   {/* size = small,default and large */}
                   Cancel
@@ -398,7 +413,7 @@ const Main: React.FC = () => {
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          <IonTitle>Click to Add Text</IonTitle>
+          <IonTitle>Total {total}</IonTitle>
           {/* <ion-buttons slot="end">
             <ion-button id="changeText" onClick="toggleText()">
               <ion-icon slot="start" name="refresh"></ion-icon>
