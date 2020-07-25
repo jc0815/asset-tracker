@@ -135,8 +135,12 @@ const Main: React.FC = () => {
   }, []);
 
   // deletes an asset in assetList
-  const deleteAsset = (asset: any) => {
-    setAssetList(assetList.filter((item) => item["Name"] !== asset["Name"]));
+  const deleteAsset = (index: any) => {
+    console.log(assetList);
+    const tempAsset = [...assetList];
+    tempAsset.splice(index, 1);
+    // console.log("tempAsset", tempAsset);
+    setAssetList(tempAsset);
   };
 
   //get the currency list
@@ -267,11 +271,11 @@ const Main: React.FC = () => {
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
-                  onClick={() => deleteAsset(asset)}
+                  onClick={() => deleteAsset(index)}
                   color="danger"
                 >
                   <IonIcon icon={trash}></IonIcon>
-                  Delete
+                  Delete›
                 </IonItemOption>
               </IonItemOptions>
             </IonItemSliding>
