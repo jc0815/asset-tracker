@@ -90,7 +90,9 @@ const Main: React.FC = () => {
       Quantity: newAssetQuant,
       Currency: newAssetCurrency.toUpperCase(),
     };
-    setAssetList((assetList) => [...assetList, newAsset]);
+    if (newAssetName && newAssetQuant && newAssetCurrency) {
+      setAssetList((assetList) => [...assetList, newAsset]);
+    }
     setShowAddModal(false);
     resetModal();
   };
@@ -101,7 +103,9 @@ const Main: React.FC = () => {
     currentAsset["Name"] = newAssetName;
     currentAsset["Quantity"] = newAssetQuant;
     currentAsset["Currency"] = newAssetCurrency;
-    setAssetList((assetList) => [...assetList]);
+    if (newAssetName && newAssetQuant && newAssetCurrency) {
+      setAssetList((assetList) => [...assetList]);
+    }
     setShowEditModal(false);
   };
 
@@ -253,11 +257,9 @@ const Main: React.FC = () => {
         ----------------
       */}
       <IonHeader>
-        <IonToolbar color="primary">
-          <IonRow>
-            <IonTitle>Virtual Wallet</IonTitle>
+        <IonToolbar>
+            <IonTitle className="main-title">Virtual Wallet</IonTitle>
             {/* <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon> */}
-          </IonRow>
         </IonToolbar>
       </IonHeader>
 
@@ -266,26 +268,15 @@ const Main: React.FC = () => {
         Content
         ----------------
       */}
-      <IonContent>
+      <IonContent className="content-main">
         {/* 
           ----------------
           List Title
           ----------------
         */}
-        <IonItem>
-          <IonGrid>
-            <IonRow>
-              <IonCol>
-                <IonLabel>Name</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>Quantity</IonLabel>
-              </IonCol>
-              <IonCol>
-                <IonLabel>Currency</IonLabel>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
+        <IonItem className="asset-title">
+          {/* TODO: be able to change name */}
+          My Asset Portfolio
         </IonItem>
 
         {/* 
@@ -305,8 +296,15 @@ const Main: React.FC = () => {
                     index
                   )
                 }
+                className="asset-item"
               >
-                <IonGrid>
+                <IonLabel>{asset["Name"]}</IonLabel>
+                <div className="asset-quant-price">
+                  <IonLabel>{asset["Quantity"]}</IonLabel>
+                  <span>$</span>
+                  <IonLabel>{asset["Currency"]}</IonLabel>
+                </div>
+                {/* <IonGrid>
                   <IonRow>
                     <IonCol>
                       <IonLabel>{asset["Name"]}</IonLabel>
@@ -318,7 +316,7 @@ const Main: React.FC = () => {
                       <IonLabel>{asset["Currency"]}</IonLabel>
                     </IonCol>
                   </IonRow>
-                </IonGrid>
+                </IonGrid> */}
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
@@ -338,16 +336,20 @@ const Main: React.FC = () => {
           Add Asset Button 
           ----------------
         */}
-        <IonItem>
+        {/* <IonItem> */}
           {/* <IonButton size="small" fill="solid" href="/tab2"> */}
+        <div className="add-asset">
           <IonButton
             size="small"
             fill="solid"
             onClick={() => setShowAddModal(true)}
+            className="add-asset-button"
           >
+            {/* New Asset */}
             <IonIcon icon={addCircleOutline}></IonIcon>
           </IonButton>
-        </IonItem>
+        </div>
+        {/* </IonItem> */}
 
         {/* 
           ----------------
@@ -379,6 +381,7 @@ const Main: React.FC = () => {
               <IonSelect
                 value={newAssetCurrency}
                 placeholder="Default: CAD"
+                className="currency-select"
                 onIonChange={(e: any) => {
                   setNewAssetCurrency(e.detail.value);
                 }}
@@ -484,7 +487,7 @@ const Main: React.FC = () => {
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          <IonGrid>
+          {/* <IonGrid>
             <IonRow>
               <IonCol>
                 <h5>Total {total}</h5>
@@ -492,6 +495,10 @@ const Main: React.FC = () => {
               <IonCol>
                 <IonSelect
                   value={currentCurrency}
+<<<<<<< HEAD
+=======
+                  placeholder={"Default: " + currentCurrency}
+>>>>>>> 8c49168a50e422a77da018f29a318d0ebc95da0f
                   onIonChange={(e: any) => {
                     changeCurrentCurrency(e.detail.value);
                   }}
@@ -502,12 +509,25 @@ const Main: React.FC = () => {
                 </IonSelect>
               </IonCol>
             </IonRow>
+          </IonGrid> */}
+          <IonGrid className="total-content">
+                <h5>Total:</h5>
+                <div>
+                  <h5>{total}</h5>
+                  <IonSelect
+                      value={currentCurrency}
+                      placeholder={currentCurrency}
+                      onIonChange={(e: any) => {
+                        changeCurrentCurrency(e.detail.value);
+                      }}
+                      style={{marginTop: '5px'}}
+                    >
+                      {Object.keys(currencyList).map((keyName, i) => (
+                        <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                      ))}
+                    </IonSelect>
+                </div>
           </IonGrid>
-          {/* <ion-buttons slot="end">
-            <ion-button id="changeText" onClick="toggleText()">
-              <ion-icon slot="start" name="refresh"></ion-icon>
-              </ion-button>
-          </ion-buttons> */}
         </IonToolbar>
       </IonFooter>
     </IonPage>
