@@ -41,17 +41,17 @@ const Main: React.FC = () => {
     Currency: "CAD",
   };
 
-  const [loadCount, setLoadCount] = useState(0);                      // count for function on load
-  const [total, setTotal] = useState(String);                         // total asset amount
-  const [currencyList, setCurrencyList] = useState({});               // list of currency rates
+  const [loadCount, setLoadCount] = useState(0); // count for function on load
+  const [total, setTotal] = useState(String); // total asset amount
+  const [currencyList, setCurrencyList] = useState({}); // list of currency rates
 
-  const [assetList, setAssetList] = useState([exampleAsset]);         // list of assets
-  const [newAssetName, setNewAssetName] = useState("");               // state of asset name (modal)
-  const [newAssetQuant, setNewAssetQuant] = useState(0);              // state of asset quantity (modal)
-  const [newAssetCurrency, setNewAssetCurrency] = useState("CAD");    // state of asset currency (modal)
+  const [assetList, setAssetList] = useState([exampleAsset]); // list of assets
+  const [newAssetName, setNewAssetName] = useState(""); // state of asset name (modal)
+  const [newAssetQuant, setNewAssetQuant] = useState(0); // state of asset quantity (modal)
+  const [newAssetCurrency, setNewAssetCurrency] = useState("CAD"); // state of asset currency (modal)
 
-  const [showAddModal, setShowAddModal] = useState(false);            // add new asset modal state
-  const [showEditModal, setShowEditModal] = useState(false);          // edit new asset modal state
+  const [showAddModal, setShowAddModal] = useState(false); // add new asset modal state
+  const [showEditModal, setShowEditModal] = useState(false); // edit new asset modal state
   const [currentEditingAsset, setCurrentEditingAsset] = useState({
     Name: "Example1",
     Quantity: 100,
@@ -59,13 +59,21 @@ const Main: React.FC = () => {
     Index: 1,
   });
 
+  const [currentCurrency, setCurrentCurrency] = useState("CAD");
+  //change the current currency for total
+  const changeCurrentCurrency = (toCurrency: string) => {
+    let value = convertCurrency(currentCurrency, toCurrency, +total).toFixed(2);
+    setCurrentCurrency(toCurrency);
+    setTotal(value + "");
+  };
+
   // save asset list to local storage
   async function setAssetsStorage() {
     await Storage.set({
       key: "assets",
       value: JSON.stringify(assetList),
     });
-  };
+  }
 
   // add a new asset (modal add is pressed)
   const onAssetSubmit = () => {
@@ -99,47 +107,52 @@ const Main: React.FC = () => {
 
   // run everytime asset list changes
   useEffect(() => {
-    if (loadCount >= 1) {                                             // once function and storage has loaded
-      setAssetsStorage();                                             // get and set assets
-      calculateTotal();                                               // calculate total (iterate through assets)
+    if (loadCount >= 1) {
+      // once function and storage has loaded
+      setAssetsStorage(); // get and set assets
+      calculateTotal(); // calculate total (iterate through assets)
     }
   }, [assetList]);
 
   // run everytime currency list changes
   useEffect(() => {
-    calculateTotal();                                                 // calculate total (iterate through assets)
+    calculateTotal(); // calculate total (iterate through assets)
   }, [currencyList]);
 
   // initial function load
   useEffect(() => {
-    getCurrencyList();                                                // get currency list (via API)
+    getCurrencyList(); // get currency list (via API)
 
-    Storage.get({ key: "assets" }).then((ret) => {                    // get local storage of assets
-      var returnValue = JSON.parse(ret.value || "{}");                // get storage asset object, otherwise empty object
+    Storage.get({ key: "assets" }).then((ret) => {
+      // get local storage of assets
+      var returnValue = JSON.parse(ret.value || "{}"); // get storage asset object, otherwise empty object
       var newList: any = [];
-      for (let asset in returnValue) {                                // iterate through storage asset object
+      for (let asset in returnValue) {
+        // iterate through storage asset object
         newList.push({
           Name: returnValue[asset].Name,
           Quantity: returnValue[asset].Quantity,
           Currency: returnValue[asset].Currency,
         });
       }
-      if (newList.length > 0) {                                       // if storage asset object is not empty
-        setAssetList(newList);                                        // store found object
+      if (newList.length > 0) {
+        // if storage asset object is not empty
+        setAssetList(newList); // store found object
       }
     });
 
-    setLoadCount(1);                                                  // useEffect for currencyList is now active
+    setLoadCount(1); // useEffect for currencyList is now active
   }, []);
 
   // calculate total by iterating asset list
   const calculateTotal = () => {
-    let tempTotal = 0;                                                // initialize total sum
-    assetList.forEach((asset) => {                                    // iterate through each asset
+    let tempTotal = 0; // initialize total sum
+    assetList.forEach((asset) => {
+      // iterate through each asset
       // convert each currency to CAD and add to sum
       tempTotal += convertCurrency(asset["Currency"], "CAD", asset["Quantity"]);
     });
-    setTotal(tempTotal.toFixed(2));                                   // set total
+    setTotal(tempTotal.toFixed(2)); // set total
   };
 
   // deletes an asset in assetList
@@ -152,17 +165,21 @@ const Main: React.FC = () => {
   // get the currency list (via exchange rates API)
   const getCurrencyList = () => {
     return fetch("https://api.exchangeratesapi.io/latest")
-      .then((res) => {                                                // gets result and return promise JSON
+      .then((res) => {
+        // gets result and return promise JSON
         return res.json();
       })
-      .then((response) => {                                           // gets JSON response from promise
+      .then((response) => {
+        // gets JSON response from promise
         // Note: base is EUR
-        setCurrencyList(response["rates"]);                           // set currency list as response
-        setCurrencyStorage(response["rates"]);                        // store response to storage
+        setCurrencyList(response["rates"]); // set currency list as response
+        setCurrencyStorage(response["rates"]); // store response to storage
         return response;
       })
-      .catch((err) => {                                               // if API fetch fails
-        getCurrencyStorage().then((res) => {                          // then use previous storage currency list
+      .catch((err) => {
+        // if API fetch fails
+        getCurrencyStorage().then((res) => {
+          // then use previous storage currency list
           setCurrencyList(res);
         });
         console.log(err);
@@ -182,11 +199,11 @@ const Main: React.FC = () => {
       Currency: currency,
       Index: index,
     };
-    setCurrentEditingAsset(temp);                                     // set current selected asset
-    setNewAssetCurrency(currency);                                    // set current selected currency
-    setNewAssetName(name);                                            // set current selected name
-    setNewAssetQuant(quantity);                                       // set current selected quantity
-    setShowEditModal(true);                                           // show edit modal
+    setCurrentEditingAsset(temp); // set current selected asset
+    setNewAssetCurrency(currency); // set current selected currency
+    setNewAssetName(name); // set current selected name
+    setNewAssetQuant(quantity); // set current selected quantity
+    setShowEditModal(true); // show edit modal
   };
 
   // store currency list to storage
@@ -206,13 +223,13 @@ const Main: React.FC = () => {
 
   // convert currency
   const convertCurrency = (
-      fromCurrency: string,
-      toCurrency: string,
-      quantity: number
-    ) => {
-      const fromRate = parseFloat(Object(currencyList)[fromCurrency]);
-      const toRate = parseFloat(Object(currencyList)[toCurrency]);
-      return quantity * (toRate / fromRate);
+    fromCurrency: string,
+    toCurrency: string,
+    quantity: number
+  ) => {
+    const fromRate = parseFloat(Object(currencyList)[fromCurrency]);
+    const toRate = parseFloat(Object(currencyList)[toCurrency]);
+    return quantity * (toRate / fromRate);
   };
 
   return (
@@ -230,7 +247,6 @@ const Main: React.FC = () => {
           </IonRow>
         </IonToolbar>
       </IonHeader>
-
 
       {/* 
         ----------------
@@ -320,7 +336,6 @@ const Main: React.FC = () => {
           </IonButton>
         </IonItem>
 
-        
         {/* 
           ----------------
           Add Asset Modal (default: false)
@@ -360,7 +375,7 @@ const Main: React.FC = () => {
                 ))}
               </IonSelect>
             </IonItem>
-            <IonRow className="cancelAdd" >
+            <IonRow className="cancelAdd">
               <IonCol size="6">
                 <IonButton
                   onClick={() => setShowAddModal(false)}
@@ -456,7 +471,26 @@ const Main: React.FC = () => {
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          <IonTitle>Total {total}</IonTitle>
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <h5>Total {total}</h5>
+              </IonCol>
+              <IonCol>
+                <IonSelect
+                  value={currentCurrency}
+                  placeholder="Default: `{currentCurrency}`"
+                  onIonChange={(e: any) => {
+                    changeCurrentCurrency(e.detail.value);
+                  }}
+                >
+                  {Object.keys(currencyList).map((keyName, i) => (
+                    <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
           {/* <ion-buttons slot="end">
             <ion-button id="changeText" onClick="toggleText()">
               <ion-icon slot="start" name="refresh"></ion-icon>
