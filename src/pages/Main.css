@@ -10,20 +10,21 @@
 }
 
 .main-title {
-  background-color: #1C1C1C !important;
+  background-color: #1c1c1c !important;
 }
 
 .settingIcon {
   display: flex;
 }
 .addModal {
-  --height: 44%;
+  --height: 40%;
   --width: 70%;
   --border-radius: 5%;
   padding: 10px;
 }
 .cancelAdd {
   margin-top: 10%;
+  margin-bottom: 20%;
 }
 
 .asset-title {

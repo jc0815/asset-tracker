@@ -244,11 +244,9 @@ const Main: React.FC = () => {
         ----------------
       */}
       <IonHeader>
-        <IonToolbar color="primary">
-          <IonRow>
+        <IonToolbar>
             <IonTitle className="main-title">Virtual Wallet</IonTitle>
             {/* <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon> */}
-          </IonRow>
         </IonToolbar>
       </IonHeader>
 
