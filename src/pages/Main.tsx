@@ -174,6 +174,9 @@ const Main: React.FC = () => {
       Index: index,
     };
     setCurrentEditingAsset(temp);
+    setNewAssetCurrency(currency);
+    setNewAssetName(name);
+    setNewAssetQuant(quantity);
     setShowEditModal(true);
   };
 
@@ -207,7 +210,7 @@ const Main: React.FC = () => {
         <IonToolbar color="primary">
           <IonRow>
             <IonTitle>Virtual Wallet</IonTitle>
-            <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon>
+            {/* <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon> */}
           </IonRow>
         </IonToolbar>
       </IonHeader>
@@ -371,19 +374,13 @@ const Main: React.FC = () => {
               ></IonInput>
             </IonItem>
             <IonItem>
-              <IonLabel position="floating">Currency</IonLabel>
+              <IonLabel position="fixed">Currency</IonLabel>
               {/* <IonInput onIonChange={(e:any)=>{setNewAssetCurrency(e.detail.value);}}></IonInput> */}
               <IonSelect
                 value={newAssetCurrency}
                 placeholder="Default: CAD"
                 onIonChange={(e: any) => {
                   setNewAssetCurrency(e.detail.value);
-                  let tempQuantitiy = convertCurrency(
-                    currentEditingAsset["Currency"],
-                    e.detail.value,
-                    currentEditingAsset["Quantity"]
-                  );
-                  setNewAssetQuant(+tempQuantitiy.toFixed());
                 }}
               >
                 {Object.keys(currencyList).map((keyName, i) => (
