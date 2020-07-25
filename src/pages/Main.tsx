@@ -75,6 +75,13 @@ const Main: React.FC = () => {
     });
   }
 
+  // save the current currency
+  async function setCurrentCurrencyStorage() {
+    await Storage.set({
+      key: "currentCurrency",
+      value: JSON.stringify(currentCurrency),
+    });
+  }
   // add a new asset (modal add is pressed)
   const onAssetSubmit = () => {
     console.log("submit");
@@ -221,6 +228,12 @@ const Main: React.FC = () => {
     });
   };
 
+  //get currentCurrency list
+  const getCurrentCurrencyStorage = () => {
+    return Storage.get({ key: "currentCurrency" }).then((response) => {
+      return response;
+    });
+  };
   // convert currency
   const convertCurrency = (
     fromCurrency: string,
@@ -479,7 +492,6 @@ const Main: React.FC = () => {
               <IonCol>
                 <IonSelect
                   value={currentCurrency}
-                  placeholder="Default: `{currentCurrency}`"
                   onIonChange={(e: any) => {
                     changeCurrentCurrency(e.detail.value);
                   }}
