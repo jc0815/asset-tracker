@@ -60,6 +60,9 @@ const Main: React.FC = () => {
   });
 
   const [currentCurrency, setCurrentCurrency] = useState("CAD");
+
+  const [portfolioName, setPortfolioName] = useState("My Portfolio");
+
   //change the current currency for total
   const changeCurrentCurrency = (toCurrency: string) => {
     let value = convertCurrency(currentCurrency, toCurrency, +total).toFixed(2);
@@ -82,6 +85,15 @@ const Main: React.FC = () => {
       value: JSON.stringify(currentCurrency),
     });
   }
+
+  // save the current portfolio name
+  async function setPortfolioNameStorage() {
+    await Storage.set({
+      key: "portfolio",
+      value: portfolioName,
+    });
+  }
+
   // add a new asset (modal add is pressed)
   const onAssetSubmit = () => {
     console.log("submit");
@@ -130,9 +142,19 @@ const Main: React.FC = () => {
     calculateTotal(); // calculate total (iterate through assets)
   }, [currencyList]);
 
+  // run everytime portfolio name changes
+  useEffect(() => {
+    if (loadCount >= 1) {
+      setPortfolioNameStorage(); // save portfolio name to storage
+    }
+  }, [portfolioName]);
+
   // initial function load
   useEffect(() => {
     getCurrencyList(); // get currency list (via API)
+    Storage.get({ key: "portfolio" }).then((ret) => {
+      setPortfolioName(ret.value || "My Portfolio");
+    });
 
     Storage.get({ key: "assets" }).then((ret) => {
       // get local storage of assets
@@ -276,7 +298,12 @@ const Main: React.FC = () => {
         */}
         <IonItem className="asset-title">
           {/* TODO: be able to change name */}
-          My Asset Portfolio
+          {/* My Asset Portfolio */}
+            <IonInput 
+              value={portfolioName}
+              placeholder="My Portfolio"
+              onIonChange={e => setPortfolioName(e.detail.value!)}
+            ></IonInput>
         </IonItem>
 
         {/* 
