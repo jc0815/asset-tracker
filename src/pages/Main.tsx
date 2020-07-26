@@ -495,10 +495,6 @@ const Main: React.FC = () => {
               <IonCol>
                 <IonSelect
                   value={currentCurrency}
-<<<<<<< HEAD
-=======
-                  placeholder={"Default: " + currentCurrency}
->>>>>>> 8c49168a50e422a77da018f29a318d0ebc95da0f
                   onIonChange={(e: any) => {
                     changeCurrentCurrency(e.detail.value);
                   }}
