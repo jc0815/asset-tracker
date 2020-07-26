@@ -64,7 +64,7 @@ const Main: React.FC = () => {
   const changeCurrentCurrency = (toCurrency: string) => {
     let value = convertCurrency(currentCurrency, toCurrency, +total).toFixed(2);
     setCurrentCurrency(toCurrency);
-    setTotal(value + "");
+    setTotal(value);
   };
 
   // save asset list to local storage
