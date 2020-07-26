@@ -17,7 +17,7 @@
   display: flex;
 }
 .addModal {
-  --height: 40%;
+  --height: 300px;
   --width: 70%;
   --border-radius: 5%;
   padding: 10px;
