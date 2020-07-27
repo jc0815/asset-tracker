@@ -49,5 +49,5 @@
     "@capacitor/cli": "2.3.0",
     "react-scripts": "3.4.1"
   },
-  "description": "An Ionic project"
+  "description": "Virtual wallet that can keep track of your assets."
 }
