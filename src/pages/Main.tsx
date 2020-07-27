@@ -413,7 +413,7 @@ const Main: React.FC = () => {
                   setNewAssetCurrency(e.detail.value);
                 }}
               >
-                {Object.keys(currencyList).map((keyName, i) => (
+                {Object.keys(currencyList).sort().map((keyName, i) => (
                   <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
                 ))}
               </IonSelect>
@@ -480,7 +480,7 @@ const Main: React.FC = () => {
                   setNewAssetCurrency(e.detail.value);
                 }}
               >
-                {Object.keys(currencyList).map((keyName, i) => (
+                {Object.keys(currencyList).sort().map((keyName, i) => (
                   <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
                 ))}
               </IonSelect>
@@ -545,7 +545,7 @@ const Main: React.FC = () => {
                       }}
                       style={{marginTop: '5px'}}
                     >
-                      {Object.keys(currencyList).map((keyName, i) => (
+                      {Object.keys(currencyList).sort().map((keyName, i) => (
                         <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
                       ))}
                     </IonSelect>
