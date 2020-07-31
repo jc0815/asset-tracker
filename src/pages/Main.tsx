@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import "currency-flags/dist/currency-flags.css";
+
 import {
   IonContent,
   IonHeader,
@@ -34,6 +36,9 @@ import { Plugins } from "@capacitor/core";
 import { AssertionError } from "assert";
 
 const Main: React.FC = () => {
+  const options = {
+    cssClass: "my-custom-interface",
+  };
   const { Storage } = Plugins;
   const exampleAsset = {
     Name: "Example1",
@@ -280,8 +285,8 @@ const Main: React.FC = () => {
       */}
       <IonHeader>
         <IonToolbar>
-            <IonTitle className="main-title">Virtual Wallet</IonTitle>
-            {/* <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon> */}
+          <IonTitle className="main-title">Virtual Wallet</IonTitle>
+          {/* <IonIcon className="settingIcon" icon={settingsOutline}></IonIcon> */}
         </IonToolbar>
       </IonHeader>
 
@@ -299,11 +304,11 @@ const Main: React.FC = () => {
         <IonItem className="asset-title">
           {/* TODO: be able to change name */}
           {/* My Asset Portfolio */}
-            <IonInput 
-              value={portfolioName}
-              placeholder="My Portfolio"
-              onIonChange={e => setPortfolioName(e.detail.value!)}
-            ></IonInput>
+          <IonInput
+            value={portfolioName}
+            placeholder="My Portfolio"
+            onIonChange={(e) => setPortfolioName(e.detail.value!)}
+          ></IonInput>
         </IonItem>
 
         {/* 
@@ -364,7 +369,7 @@ const Main: React.FC = () => {
           ----------------
         */}
         {/* <IonItem> */}
-          {/* <IonButton size="small" fill="solid" href="/tab2"> */}
+        {/* <IonButton size="small" fill="solid" href="/tab2"> */}
         <div className="add-asset">
           <IonButton
             size="small"
@@ -412,10 +417,22 @@ const Main: React.FC = () => {
                 onIonChange={(e: any) => {
                   setNewAssetCurrency(e.detail.value);
                 }}
+                interfaceOptions={options}
               >
-                {Object.keys(currencyList).sort().map((keyName, i) => (
-                  <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
-                ))}
+                {Object.keys(currencyList)
+                  .sort()
+                  .map((keyName, i) => {
+                    return (
+                      <div>
+                        <IonSelectOption value={keyName}>
+                          <IonIcon icon={trash}></IonIcon>
+                          <IonLabel className="currency-flag currency-flag-usd">
+                            {keyName}
+                          </IonLabel>
+                        </IonSelectOption>
+                      </div>
+                    );
+                  })}
               </IonSelect>
             </IonItem>
             <IonRow className="cancelAdd">
@@ -480,9 +497,11 @@ const Main: React.FC = () => {
                   setNewAssetCurrency(e.detail.value);
                 }}
               >
-                {Object.keys(currencyList).sort().map((keyName, i) => (
-                  <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
-                ))}
+                {Object.keys(currencyList)
+                  .sort()
+                  .map((keyName, i) => (
+                    <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                  ))}
               </IonSelect>
             </IonItem>
             <IonRow className="cancelAdd">
@@ -534,22 +553,24 @@ const Main: React.FC = () => {
             </IonRow>
           </IonGrid> */}
           <IonGrid className="total-content">
-                <h5>Total:</h5>
-                <div>
-                  <h5>{total}</h5>
-                  <IonSelect
-                      value={currentCurrency}
-                      placeholder={currentCurrency}
-                      onIonChange={(e: any) => {
-                        changeCurrentCurrency(e.detail.value);
-                      }}
-                      style={{marginTop: '5px'}}
-                    >
-                      {Object.keys(currencyList).sort().map((keyName, i) => (
-                        <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
-                      ))}
-                    </IonSelect>
-                </div>
+            <h5>Total:</h5>
+            <div>
+              <h5>{total}</h5>
+              <IonSelect
+                value={currentCurrency}
+                placeholder={currentCurrency}
+                onIonChange={(e: any) => {
+                  changeCurrentCurrency(e.detail.value);
+                }}
+                style={{ marginTop: "5px" }}
+              >
+                {Object.keys(currencyList)
+                  .sort()
+                  .map((keyName, i) => (
+                    <IonSelectOption value={keyName}>{keyName}</IonSelectOption>
+                  ))}
+              </IonSelect>
+            </div>
           </IonGrid>
         </IonToolbar>
       </IonFooter>
